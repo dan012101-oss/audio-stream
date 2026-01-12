@@ -1,1 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Audio Stream</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    button {
+      font-size: 20px;
+      padding: 15px 30px;
+      cursor: pointer;
+    }
+    audio {
+      margin-top: 20px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div>
+  <h1>LIVE AUDIO STREAM</h1>
+  <p>Нажмите кнопку, чтобы подключиться</p>
+  <button onclick="connect()">ПОДКЛЮЧИТЬСЯ</button>
+  <audio id="audio" autoplay controls></audio>
+</div>
+
+<script>
+let pc;
+
+async function connect() {
+  pc = new RTCPeerConnection();
+
+  pc.ontrack = (event) => {
+    document.getElementById('audio').srcObject = event.streams[0];
+  };
+
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+
+  alert("Скопируй SDP Offer и передай источнику:\n\n" + offer.sdp);
+}
+</script>
+
+</body>
+</html>
 
